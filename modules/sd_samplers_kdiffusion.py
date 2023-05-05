@@ -1,5 +1,6 @@
 from collections import deque
 import torch
+import os
 import inspect
 import einops
 import k_diffusion.sampling
@@ -373,6 +374,12 @@ class KDiffusionSampler:
             noise_sampler = self.create_noise_sampler(x, sigmas, p)
             extra_params_kwargs['noise_sampler'] = noise_sampler
 
+        disable = os.getenv('SUPPRESS_LOG')
+        if disable == None or disable == '':
+            disable = False
+        else:
+            disable = True
+
         self.last_latent = x
         samples = self.launch_sampling(steps, lambda: self.func(self.model_wrap_cfg, x, extra_args={
             'cond': conditioning, 
@@ -380,7 +387,7 @@ class KDiffusionSampler:
             'uncond': unconditional_conditioning, 
             'cond_scale': p.cfg_scale,
             's_min_uncond': self.s_min_uncond
-        }, disable=False, callback=self.callback_state, **extra_params_kwargs))
+        }, disable=disable, callback=self.callback_state, **extra_params_kwargs))
 
         return samples
 
