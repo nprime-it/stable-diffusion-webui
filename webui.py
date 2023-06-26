@@ -281,6 +281,11 @@ def api_only():
     setup_middleware(app)
     api = create_api(app)
 
+    # DJDJ
+    # txt2api 실행시 lora 가 적용되지 않는 문제 patch 'Skipping unknown extra network: lora'
+    # https://github.com/AUTOMATIC1111/stable-diffusion-webui/issues/7984
+    modules.script_callbacks.before_ui_callback()
+    
     modules.script_callbacks.app_started_callback(None, app)
 
     print(f"Startup time: {startup_timer.summary()}.")
